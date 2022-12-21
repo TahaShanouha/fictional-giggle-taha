@@ -3,7 +3,7 @@ import { useState } from 'react';
 import './App.css';
 import {
   readPlayers,
-} from './Players'
+} from './readPlayers'
 import PlayerList from './components/PlayerList';
 
 function App() {
