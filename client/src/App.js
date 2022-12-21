@@ -1,15 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
-import logo from './logo.svg';
 import './App.css';
 import {
   readPlayers,
-  readPlayersFromJsonString,
-  readPlayersFromDatabase,
-  displayPlayersFromJson,
-  displayPlayersFromDatabase,
-  displayPlayersFromApi
 } from './Players'
+import PlayerList from './components/PlayerList';
 
 function App() {
 
@@ -17,57 +12,12 @@ function App() {
   const [timestamp, setTimestamp] = useState();
 
 
-  const doGetPlayers = async (source, fileName) => {
+  const getPlayers = async (source, fileName) => {
     const rightNow = new Date();
     setTimestamp(`Data last changed: ${rightNow.toLocaleTimeString()}`);
 
-    let players;
-    switch (source) {
-      case 'json':
-        players = JSON.parse(readPlayersFromJsonString());
-        setPlayers(displayPlayersFromJson(players))
-        break;
-      case 'database':
-        players = readPlayersFromDatabase();
-        setPlayers(displayPlayersFromDatabase(players))
-        break;
-      case 'api':
-        const playersResponse = await fetch('api/getPlayersFromFile/.%2Fdata%2Fplayerdata.json', {
-          headers: {
-            'accept': 'application/json'
-          }
-        });
-        players = JSON.parse(await playersResponse.json());
-        const responseDisplay = await fetch('/ui/getApiRenderResponseDisplay', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(players)
-        });
-        const responseText = await responseDisplay.text();
-        const responseArray = JSON.parse(responseText);
-        setPlayers(responseArray.join(''));
-        break;
-    }
-  }
-  const doPlayersClear = () => {
-    setTimestamp('');
-    setPlayers([]);
-  }
-
-  const doRender = () => {
-    if (typeof players === 'object') {
-      return (
-        <ul>
-          {players}
-        </ul>
-      );
-    } else { 
-      return (
-        <ul dangerouslySetInnerHTML={{__html: players}} />
-      );
-    }
+    let players = await readPlayers(source, fileName);
+    setPlayers(players);
   }
 
   return (
@@ -76,22 +26,20 @@ function App() {
         <span className="last-accessed">{timestamp}</span>
         <div className='container'>
           <div className='buttons'>
-            <button onClick={() => doGetPlayers('json', '')}>
+            <button onClick={() => getPlayers('json', '')}>
               Load Players Json
             </button>
-            <button onClick={() => doGetPlayers('database', '')}>
+            <button onClick={() => getPlayers('database', '')}>
               Load Players DB
             </button>
-            <button onClick={() => doGetPlayers('api', '')}>
+            <button onClick={() => getPlayers('api', '')}>
               Load Players API
             </button>
-            <button onClick={() => doPlayersClear()}>
+            <button onClick={() => { setTimestamp(''); setPlayers([]); }}>
               Clear Players
             </button>
           </div>
-          <div className={'players-list'}>
-            {doRender()}
-          </div>
+          <PlayerList players={players} />
         </div>
       </header>
     </div>

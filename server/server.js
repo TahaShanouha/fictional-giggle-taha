@@ -13,24 +13,7 @@ app.get('/health', (req, res) => {
 });
 
 app.get('/api/getPlayersFromFile/:filename', async (req, res) => {
-    res.json(await fs.readFile(req.params.filename, 'utf-8'));
-})
-
-app.post('/ui/getApiRenderResponseDisplay', (req, res) => {
-    const players = req.body;
-
-    res.set('Content-Type', 'text/html');
-    const list = (players.map((player, i) => {
-        return `<li key=${i}> \
-            <ul> \
-              <li class="${player.name}"}>${player.name}</li> \
-              <li>${player.age}</li> \
-              <li>${player.job}</li> \
-              <li>${player.salary}</li> \
-            </ul> \
-          </li>`;
-      }));
-      res.send(list);
+    res.json(await fs.readFile("../data/" + req.params.filename, 'utf-8'));
 })
 
 app.listen(PORT, () => {
