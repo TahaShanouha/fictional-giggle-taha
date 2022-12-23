@@ -1,6 +1,6 @@
 import queryForPlayers from "./PlayersDb";
 
-const readPlayers = async (source, fileName) => {
+const readPlayers = async (source) => {
   switch (source) {
     case 'json':
       return JSON.parse(readPlayersFromJsonString());

@@ -10,14 +10,16 @@ function App() {
 
   const [players, setPlayers] = useState([]);
   const [timestamp, setTimestamp] = useState();
+  const [loading, setLoading] = useState(false);
 
 
-  const getPlayers = async (source, fileName) => {
+  const getPlayers = async (source) => {
     const rightNow = new Date();
     setTimestamp(`Data last changed: ${rightNow.toLocaleTimeString()}`);
 
-    let players = await readPlayers(source, fileName);
+    let players = await readPlayers(source);
     setPlayers(players);
+    setLoading(false);
   }
 
   return (
@@ -26,20 +28,22 @@ function App() {
         <span className="last-accessed">{timestamp}</span>
         <div className='container'>
           <div className='buttons'>
-            <button onClick={() => getPlayers('json', '')}>
+            <button onClick={() => { setLoading(true); getPlayers('json') }}>
               Load Players Json
             </button>
-            <button onClick={() => getPlayers('database', '')}>
+            <button onClick={() => {setLoading(true);getPlayers('database')}}>
               Load Players DB
             </button>
-            <button onClick={() => getPlayers('api', '')}>
+            <button onClick={() => {setLoading(true);getPlayers('api')}}>
               Load Players API
             </button>
             <button onClick={() => { setTimestamp(''); setPlayers([]); }}>
               Clear Players
             </button>
           </div>
-          <PlayerList players={players} />
+          {!loading && (
+            <PlayerList players={players} />
+          )}
         </div>
       </header>
     </div>
